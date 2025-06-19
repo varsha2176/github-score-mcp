@@ -2,48 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GitHub Score Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GitHub Scorer</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       text-align: center;
       margin-top: 50px;
-      background: #f5f7fa;
     }
-    input, button {
+    input {
       padding: 10px;
-      font-size: 16px;
-      margin: 5px;
+      width: 250px;
     }
-    .score {
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+    }
+    #result {
       margin-top: 20px;
-      font-size: 20px;
-      color: green;
-    }
-    .error {
-      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>GitHub Score Checker</h1>
-  <input id="username" type="text" placeholder="Enter GitHub username" />
-  <button onclick="getScore()">Check Score</button>
-  <div class="score" id="result"></div>
+  <h1>GitHub Scorer</h1>
+  <p>Enter a GitHub username to calculate their score:</p>
+  <input type="text" id="username" placeholder="e.g., varsha2176" />
+  <button onclick="getScore()">Get Score</button>
+
+  <div id="result"></div>
 
   <script>
     async function getScore() {
-      const user = document.getElementById('username').value;
-      const res = await fetch(`/score/${user}`);
-      const data = await res.json();
-      const result = document.getElementById('result');
-      if (res.ok) {
-        result.innerHTML = `${data.username}'s GitHub Score is: <strong>${data.score}</strong>`;
-        result.className = 'score';
-      } else {
-        result.innerHTML = data.error;
-        result.className = 'score error';
-      }
+      const username = document.getElementById('username').value;
+      const response = await fetch(`/score/${username}`);
+      const result = await response.json();
+      const output = result.error
+        ? `❌ ${result.error}`
+        : `✅ ${result.username}'s score is ${result.score}`;
+      document.getElementById('result').textContent = output;
     }
   </script>
 </body>
