@@ -1,29 +1,35 @@
 const express = require('express');
 const axios = require('axios');
-const path = require('path');
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the "public" folder
+// Serve frontend from public folder (optional)
 app.use(express.static('public'));
 
-// API route
+// Root route (so "Cannot GET /" doesn't appear)
+app.get('/', (req, res) => {
+  res.send("✅ GitHub Scorer API is running! Use /score/:username");
+});
+
+// GitHub score route
 app.get('/score/:username', async (req, res) => {
   const username = req.params.username;
   try {
-    const { data } = await axios.get(`https://api.github.com/users/${username}`);
+    const { data } = await axios.get(`https://api.github.com/users/${username}`, {
+      headers: {
+        Authorization: `token ${process.env.GITHUB_TOKEN}`
+      }
+    });
+
     const score = data.public_repos * 2 + data.followers * 3;
     res.json({ username, score });
   } catch (error) {
-    res.status(404).json({ error: 'User not found' });
+    res.status(404).json({ error: 'User not found or API error' });
   }
 });
 
-// Root route (serves index.html)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
